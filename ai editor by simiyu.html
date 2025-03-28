@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video & Photo Editor</title>
+    <style>
+        /* Background gradient animation */
+        @keyframes backgroundAnimation {
+            0% { background: linear-gradient(to right, #1e3c72, #2a5298); }
+            25% { background: linear-gradient(to right, #ff7e5f, #feb47b); }
+            50% { background: linear-gradient(to right, #43cea2, #185a9d); }
+            75% { background: linear-gradient(to right, #ff512f, #dd2476); }
+            100% { background: linear-gradient(to right, #1e3c72, #2a5298); }
+        }
+        /* Animated text colors */
+        @keyframes textAnimation {
+            0% { color: #ff0000; }
+            25% { color: #ff9900; }
+            50% { color: #33cc33; }
+            75% { color: #3399ff; }
+            100% { color: #9900cc; }
+        }
+        /* General styling */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            animation: backgroundAnimation 10s infinite alternate;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .header {
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        .upload-section, .controls {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+        }
+        .media-display img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+        /* Styling for the congratulatory message */
+        .congrats-message {
+            font-size: 2em;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            animation: textAnimation 3s infinite alternate;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Video & Photo Editor</h1>
+            <p>Edit your videos and photos with AI-powered tools</p>
+        </div>
+        <!-- Upload section -->
+        <div class="upload-section">
+            <h2>Upload Your Media</h2>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        <!-- Display uploaded image -->
+        <div class="media-display" id="mediaDisplay">
+            <p>No media selected</p>
+        </div>
+        <!-- Editing controls -->
+        <div class="controls"></br>
+            <label>Contrast: <input type="range" min="0" max="200" value="100" id="contrast"></label>
+            <label>Brightness: <input type="range" min="0" max="200" value="100" id="brightness"></label></br>
+            <label>Saturation: <input type="range" min="0" max="200" value="100" id="saturation"></label>
+            <button onclick="saveImage()">Save</button>
+        </div>
+        <!-- Congratulatory message -->
+        <div id="congratsMessage" class="congrats-message" style="display: none;">🎉 Congratulations! Your image has been saved! 🎉</div>
+    </div>
+    <script>
+        let imgElement;
+        
+        // Handle file upload and display image
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const mediaDisplay = document.getElementById('mediaDisplay');
+            mediaDisplay.innerHTML = "";
+            if (file && file.type.startsWith('image/')) {
+                imgElement = document.createElement('img');
+                imgElement.src = URL.createObjectURL(file);
+                imgElement.id = 'editableMedia';
+                imgElement.style.transition = '0.3s';
+                mediaDisplay.appendChild(imgElement);
+            }
+        });
+        
+        // Attach event listeners to sliders for real-time updates
+        document.querySelectorAll('input[type=range]').forEach(input => {
+            input.addEventListener('input', updateFilters);
+        });
+        
+        // Update image filters based on slider values
+        function updateFilters() {
+            if (!imgElement) return;
+            const contrast = document.getElementById('contrast').value;
+            const brightness = document.getElementById('brightness').value;
+            const saturation = document.getElementById('saturation').value;
+            imgElement.style.filter = `contrast(${contrast}%) brightness(${brightness}%) saturate(${saturation}%)`;
+        }
+        
+        // Save the edited image
+        function saveImage() {
+            if (!imgElement) {
+                alert('No image to save.');
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+            ctx.filter = imgElement.style.filter;
+            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'edited-image.png';
+            link.click();
+            // Show congratulatory message after saving
+            document.getElementById('congratsMessage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
+
+
